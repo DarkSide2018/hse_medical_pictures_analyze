@@ -4,7 +4,17 @@
 
 ## Тема: обработка медицинских изображений(27)
 
-## Датасет: https://www.kaggle.com/datasets/shubhamgoel27/dermnet
+## Датасет 
+https://www.kaggle.com/datasets/shubhamgoel27/dermnet
+
+ссылка на скачивание:
+
+### Описание датасета
+Датасет представляет собой 19500 изображений разбитых на обучающие и тестовые наборы (15500 / 4000).
+
+Данные состоят из изображений 23 типов кожных заболеваний, взятых с http://www.dermnet.com/dermatology-pictures-skin-disease-pictures. 
+
+Категории включают прыщи, меланому, экзему, себорейный кератоз, стригущий лишай, буллезную болезнь, ядовитый плющ, псориаз, сосудистые опухоли и т. д.
 
 ## Команда:
 + **Кирилл Ф.**
@@ -16,27 +26,8 @@
 
 # Описание
 
-    Цель данного проекта - создать рабочую модель CV по обработке и анализу медицинских изображений.
+Цель данного проекта - создать рабочую CV модель для классификации изображений к одной из 23 категории заболеваний.
 
+А так же создать сервис для загрузки и предобработки изображений.
 
-# HSE, Machine learning and highload systems, 2023
-
-![Alt text](assets/image.png)
-
-## Project title: Medical image analysis(27)
-
-## Dataset: https://www.kaggle.com/datasets/shubhamgoel27/dermnet
-
-## Dream team:
-
-+ **Kirill F.**
-+ **Marat G.**
-+ **Roman G.**
-+ **Roman Z.**
-
-
-**Tutor: Kirill K.**
-
-# Description
-
-    The goal of this project is to create a working CV model for medical image processing and analysis.
+Дополнительно в рамках проекта будут проведены работы по созданию ci/cd - автоматизации процесса сборки, настройки и развертывания сервиса и модели.   
