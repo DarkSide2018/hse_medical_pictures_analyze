@@ -1,9 +1,9 @@
+from skimage import io
 import os
 import seaborn as sns
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
-
 
 def calculate_channel_average(img, channel):
     channel_dict = {"R": 0, "G": 1, "B": 2}
@@ -14,7 +14,7 @@ def data_dictionary():
     path_train = "/home/roman/Documents/hse/skin_problems/train/"
     train_data_categories = os.listdir(path_train)
     list_train = train_data_categories
-    train_dictionary = {"image_path": [], "target": [], "Label": []}
+    train_dictionary = {"image_path": [], "target": [], "Label": [], "Image":[]}
     k = 0
     for i in list_train:
         path_train_item = path_train + i
@@ -24,6 +24,7 @@ def data_dictionary():
             train_dictionary["image_path"].append(img_path_train)
             train_dictionary['target'].append(k)
             train_dictionary['Label'].append(i)
+            train_dictionary['Image'].append(io.imread(img_path_train))
         k += 1
     return pd.DataFrame(train_dictionary)
 

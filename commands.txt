@@ -1,0 +1,5 @@
+ Загрузить файлы на s3
+ aws s3 cp SOURCE_DIR s3://hse-medical-pictures/ --recursive
+
+ Удалить все из бакета
+ aws s3 rb s3://bucket-name --force
