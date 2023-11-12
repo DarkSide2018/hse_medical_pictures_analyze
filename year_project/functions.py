@@ -1,9 +1,11 @@
-from skimage import io
 import os
-import seaborn as sns
+
 import numpy as np
 import pandas as pd
+import seaborn as sns
 from matplotlib import pyplot as plt
+from skimage import io
+
 
 def calculate_channel_average(img, channel):
     channel_dict = {"R": 0, "G": 1, "B": 2}
