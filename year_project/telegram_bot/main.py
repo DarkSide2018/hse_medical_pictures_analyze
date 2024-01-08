@@ -12,6 +12,7 @@ from aiogram.types import Message
 from dotenv import load_dotenv
 
 from year_project.telegram_bot.tgb_service import create_predictable_dataframe, get_label
+from year_project.telegram_bot.upload_model_to_s3 import model_from_s3
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -58,7 +59,13 @@ async def handle_image_cat_boost(message: types.Message):
     file_id = message.photo[-1].file_id
     file_info = await bot.get_file(file_id)
     downloaded_file = await bot.download_file(file_info.file_path)
-    pickled_model = pickle.load(open('gs_cb_best_estimator_.pickle', 'rb'))
+    file_path = 'gs_cb_best_estimator.pickle'
+    if os.path.exists(file_path):
+        print("file exists")
+    else:
+        print("file does not exist")
+        model_from_s3("gs_cb_best_estimator")
+    pickled_model = pickle.load(open(file_path, 'rb'))
     dataframe = create_predictable_dataframe(downloaded_file)
     predicted = pickled_model.predict(dataframe)
     await message.answer(f"{message.from_user.full_name} : предсказанное значение : {get_label(predicted[0][0])}")
