@@ -3,9 +3,7 @@ import asyncio
 import logging
 import os
 import pickle
-import numpy as np
-import io
-from PIL import Image
+
 from aiogram import Bot, Dispatcher, Router, types
 from aiogram.filters import Command
 from aiogram.types import Message
@@ -49,7 +47,6 @@ async def handle_image_svm(message: types.Message):
     downloaded_file = await bot.download_file(file_info.file_path)
     pickled_model = pickle.load(open('svm_svc_best_estimator.pickle', 'rb'))
     dataframe = create_predictable_dataframe(downloaded_file)
-    print(dataframe)
     predicted = pickled_model.predict(dataframe)
     await message.answer(f"{message.from_user.full_name} : предсказанное значение : {get_label(predicted[0])}")
 
