@@ -9,6 +9,18 @@ from sqlalchemy import create_engine
 
 from year_project.telegram_bot.extracting import round_half_up, calculate_channel_average, get_hog_mean, get_hog_std, \
     get_harris_corners_count, get_harris_corner_mean
+import requests
+
+
+def get_skin_problems_dataset(part):
+    response = requests.get(
+        f'http://localhost:8080/dataset/skin/{part}')
+    if response.status_code == 200:
+        json_data = response.json()
+        return pd.DataFrame(json_data)
+    else:
+        print('Failed to retrieve data from the API')
+
 
 conn_string = 'postgresql://hse_medical:123456@localhost:5450/hse_medical'
 
@@ -22,7 +34,7 @@ conn_select = psycopg2.connect(
     password='123456',
     host='127.0.0.1',
     port='5450',
-    options="-c search_path=analyze"
+    options="-c search_path=analyze_medical"
 )
 
 conn_select.autocommit = True
