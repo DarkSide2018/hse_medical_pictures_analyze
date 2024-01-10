@@ -2,6 +2,7 @@ import pickle
 
 import pandas as pd
 from catboost import CatBoostClassifier, Pool
+from sklearn.decomposition import PCA
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import r2_score
 from sklearn.metrics import roc_auc_score
@@ -26,8 +27,13 @@ try:
 
     dataframe_train_scaled = scaler.fit_transform(dataframe_train)
     dataframe_test_scaled = scaler.fit_transform(dataframe_test)
-    X_train = dataframe_train_scaled
-    X_test = dataframe_test_scaled
+
+    pca = PCA(n_components=4)
+    data_train_pca_transformed = pca.fit_transform(dataframe_train_scaled)
+    data_test_pca_transformed = pca.fit_transform(dataframe_test_scaled)
+
+    X_train = data_train_pca_transformed
+    X_test = data_test_pca_transformed
 
     notify_bot(f"CatBoostClassifier started optuna")
 
@@ -43,7 +49,7 @@ try:
                                bagging_temperature=best_params['bagging_temperature'],
                                classes_count=23,
                                thread_count=-1,
-                               l2_leaf_reg=0.1,
+                               l2_leaf_reg=best_params['l2_leaf_reg'],
                                class_names=list(range(23)),
                                verbose=200
                                )
@@ -79,12 +85,11 @@ try:
     roc_auc = roc_auc_score(y_test, pred_cb, multi_class='ovr')
 
     print(f"roc_auc cat_boost : {roc_auc}")
-    feature_names = dataframe_train.columns
-    feature_importance = pd.DataFrame({'feature': feature_names, 'importance': feature_importance})
-    loss_function_change = pd.DataFrame({'feature': feature_names, 'importance': loss_function_change})
-    prediction_values_change = pd.DataFrame({'feature': feature_names, 'importance': prediction_values_change})
+
+    feature_importance = pd.DataFrame({'importance': feature_importance})
+    loss_function_change = pd.DataFrame({'importance': loss_function_change})
+    prediction_values_change = pd.DataFrame({'importance': prediction_values_change})
     report = f'''
-       
         cat_boost report:
         roc_auc_score : {roc_auc}
         Accuracy : {accuracy}
