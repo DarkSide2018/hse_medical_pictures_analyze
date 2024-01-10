@@ -78,39 +78,8 @@ INSERT INTO "analyze_medical".target_dictionary (target,"label") VALUES
 
 ALTER TABLE "analyze_medical".target_dictionary ADD CONSTRAINT label_unique UNIQUE (Label);
 
+
+drop index if exists  image_path_index_test,image_path_index_train;
+
 CREATE INDEX image_path_index_train ON "analyze_medical".medical_pictures_train(image_path);
 CREATE INDEX image_path_index_test ON "analyze_medical".medical_pictures_test(image_path);
-
-create table "analyze_medical".med_pictures_pca_train(
-                              picture_id              UUID        NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
-                              created_at             TIMESTAMP    NOT NULL DEFAULT now(),
-                              updated_at             TIMESTAMP    NULL,
-                              target                 integer not null,
-                              Label  TEXT NOT null,
-                              image_path  TEXT NOT null,
-                              red_channel_intensity numeric(10,5) not null,
-                              blue_channel_intensity numeric(10,5) not null,
-                              green_channel_intensity numeric(10,5) not null,
-                              HOG_mean numeric(10,5) not null,
-                              harris_count integer null,
-                              harris_count_mean numeric(10, 5) NULL,
-                              HOG_std numeric(10,5) not null
-);
-create table "analyze_medical".med_pictures_pca_test(
-                              picture_id              UUID        NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
-                              created_at             TIMESTAMP    NOT NULL DEFAULT now(),
-                              updated_at             TIMESTAMP    NULL,
-                              target                 integer not null,
-                              Label  TEXT NOT null,
-                              image_path  TEXT NOT null,
-                              red_channel_intensity numeric(10,5) not null,
-                              blue_channel_intensity numeric(10,5) not null,
-                              green_channel_intensity numeric(10,5) not null,
-                              HOG_mean numeric(10,5) not null,
-                              harris_count integer null,
-                              harris_count_mean numeric(10, 5) NULL,
-                              HOG_std numeric(10,5) not null
-);
-
-CREATE INDEX image_path_index_train ON "analyze_medical".med_pictures_pca_train(image_path);
-CREATE INDEX image_path_index_test ON "analyze_medical".med_pictures_pca_test(image_path);
