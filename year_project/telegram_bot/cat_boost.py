@@ -14,10 +14,9 @@ from year_project.telegram_bot.optuna_optimizer import create_best_params
 try:
 
     dataframe_train = get_skin_problems_dataset("train")
-    dataframe_train.drop('harrisCount', axis=1, inplace=True)
+    print(dataframe_train.columns)
     dataframe_test = get_skin_problems_dataset("test")
-    dataframe_test.drop('harrisCount', axis=1, inplace=True)
-
+    print(dataframe_test)
     y_train = dataframe_train['target']
     dataframe_train.drop('target', axis=1, inplace=True)
     y_test = dataframe_test['target']
@@ -32,7 +31,7 @@ try:
 
     notify_bot(f"CatBoostClassifier started optuna")
 
-    best_params = create_best_params(X_train,y_train)
+    best_params = create_best_params(X_train, y_train)
 
     model = CatBoostClassifier(max_depth=best_params['max_depth'],
                                eval_metric='HammingLoss',
@@ -69,8 +68,6 @@ try:
 
     print(f"feature_importance: {feature_importance}")
 
-    print(f"best_params cat_boost : {best_params}")
-
     r2_score = r2_score(y_test, predicted)
 
     print(f"r2_score cat_boost : {r2_score}")
@@ -82,19 +79,20 @@ try:
     roc_auc = roc_auc_score(y_test, pred_cb, multi_class='ovr')
 
     print(f"roc_auc cat_boost : {roc_auc}")
-    feature_names = X_train.columns  # Assuming X_train is a DataFrame
+    feature_names = dataframe_train.columns
     feature_importance = pd.DataFrame({'feature': feature_names, 'importance': feature_importance})
     loss_function_change = pd.DataFrame({'feature': feature_names, 'importance': loss_function_change})
     prediction_values_change = pd.DataFrame({'feature': feature_names, 'importance': prediction_values_change})
     report = f'''
+       
         cat_boost report:
         roc_auc_score : {roc_auc}
         Accuracy : {accuracy}
         r2_score : {r2_score}
-        best_params : {best_params}
         feature_importance : {feature_importance}
         loss_function_change: {loss_function_change}
         prediction_values_change: {prediction_values_change}
+        best_params: {best_params}
         '''
     notify_bot(report)
 

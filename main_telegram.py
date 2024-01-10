@@ -56,7 +56,9 @@ async def handle_image_cat_boost(message: types.Message):
     file_id = message.photo[-1].file_id
     file_info = await bot.get_file(file_id)
     downloaded_file = await bot.download_file(file_info.file_path)
-    file_path = 'year_project/telegram_bot/gs_cb_best_estimator.pickle'
+    file_path = 'year_project/telegram_bot/cat_boost_model.pickle'
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    print(f'dirpath: {dir_path}')
     if os.path.exists(file_path):
         print("file exists")
     else:

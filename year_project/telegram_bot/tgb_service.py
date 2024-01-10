@@ -7,7 +7,7 @@ from PIL import Image
 from dotenv import load_dotenv
 
 from year_project.telegram_bot.extracting import round_half_up, get_hog_mean, get_hog_std, get_harris_corners_count, \
-    get_harris_corner_mean, calculate_channel_average_v2
+    get_harris_corner_mean, calculate_channel_average_v2, count_hough_circles
 from year_project.telegram_bot.functions import get_connection
 
 load_dotenv()
@@ -28,11 +28,16 @@ def create_predictable_dataframe(image):
     img = Image.open(io.BytesIO(read))
     hog_mean = round_half_up(get_hog_mean(img), 5)
     hog_std = round_half_up(get_hog_std(img), 5)
+    hough_circle = count_hough_circles(np.array(img))
     new_row = {
         'red_channel_intensity': red_channel_intensity,
         'blue_channel_intensity': blue_channel_intensity,
         'green_channel_intensity': green_channel_intensity,
+        "redAvg": red_channel_intensity,
+        "blueAvg": blue_channel_intensity,
+        "greenAvg": green_channel_intensity,
         'HOG_mean': hog_mean,
+        "houghCircle": hough_circle,
         'harris_count': get_harris_corners_count(img=np.array(img)),
         'harris_count_mean': get_harris_corner_mean(img=np.array(img)),
         'HOG_std': hog_std
