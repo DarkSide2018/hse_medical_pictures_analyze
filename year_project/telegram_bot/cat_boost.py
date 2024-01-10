@@ -1,65 +1,72 @@
 import pickle
 
-from catboost import CatBoostClassifier
+import pandas as pd
+from catboost import CatBoostClassifier, Pool
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import r2_score
 from sklearn.metrics import roc_auc_score
-from sklearn.model_selection import GridSearchCV
+from sklearn.preprocessing import StandardScaler
 
-from year_project.telegram_bot.functions import data_dictionary
+from year_project.telegram_bot.functions import get_skin_problems_dataset
 from year_project.telegram_bot.notify_bot_service import notify_bot
-
-model = CatBoostClassifier(max_depth=12,
-                           eval_metric='HammingLoss',
-                           early_stopping_rounds=10,
-                           random_seed=42,
-                           loss_function='MultiClass',
-                           bagging_temperature=1.0,
-                           classes_count=23,
-                           thread_count=-1,
-                           l2_leaf_reg=0.1,
-                           class_names=list(range(23)),
-                           verbose=200)
+from year_project.telegram_bot.optuna_optimizer import create_best_params
 
 try:
 
-    dataframe_train = data_dictionary(part="train")
-    dataframe_test = data_dictionary(part="test")
-
+    dataframe_train = get_skin_problems_dataset("train")
+    print(dataframe_train.columns)
+    dataframe_test = get_skin_problems_dataset("test")
+    print(dataframe_test)
     y_train = dataframe_train['target']
-
     dataframe_train.drop('target', axis=1, inplace=True)
-
-    X_train = dataframe_train
-
     y_test = dataframe_test['target']
-
     dataframe_test.drop('target', axis=1, inplace=True)
 
-    X_test = dataframe_test
+    scaler = StandardScaler()
 
-    params = {
-        'n_estimators': [500]
-    }
+    dataframe_train_scaled = scaler.fit_transform(dataframe_train)
+    dataframe_test_scaled = scaler.fit_transform(dataframe_test)
+    X_train = dataframe_train_scaled
+    X_test = dataframe_test_scaled
 
-    gs_cb = GridSearchCV(model, params, cv=1, scoring='roc_auc_ovr', verbose=2)
+    notify_bot(f"CatBoostClassifier started optuna")
 
-    notify_bot(f"CatBoostClassifier started grid search")
+    best_params = create_best_params(X_train, y_train)
 
-    gs_cb.fit(X_train, y_train)
+    model = CatBoostClassifier(max_depth=best_params['max_depth'],
+                               eval_metric='HammingLoss',
+                               learning_rate=best_params['learning_rate'],
+                               n_estimators=best_params['n_estimators'],
+                               early_stopping_rounds=10,
+                               random_seed=42,
+                               loss_function='MultiClass',
+                               bagging_temperature=best_params['bagging_temperature'],
+                               classes_count=23,
+                               thread_count=-1,
+                               l2_leaf_reg=0.1,
+                               class_names=list(range(23)),
+                               verbose=200
+                               )
 
-    gs_cb_best_estimator_ = gs_cb.best_estimator_
+    model.fit(X_train, y_train)
 
-    with open('gs_cb_best_estimator_.pickle', 'wb') as f:
-        pickle.dump(gs_cb_best_estimator_, f)
+    with open('cat_boost_model.pickle', 'wb') as f:
+        pickle.dump(model, f)
 
-    pickled_model = pickle.load(open('gs_cb_best_estimator_.pickle', 'rb'))
+    pickled_model = pickle.load(open('cat_boost_model.pickle', 'rb'))
 
     pred_cb = pickled_model.predict_proba(X_test)
     predicted = pickled_model.predict(X_test)
 
-    print(f"best_params cat_boost : {gs_cb.best_params_}")
-    print(f"best_score cat_boost : {gs_cb.best_score_}")
+    train_pool = Pool(X_train, label=y_train)
+
+    print(f'Xtrain describe: {X_train}')
+
+    feature_importance = pickled_model.get_feature_importance(data=train_pool, type="FeatureImportance")
+    prediction_values_change = pickled_model.get_feature_importance(data=train_pool, type="PredictionValuesChange")
+    loss_function_change = pickled_model.get_feature_importance(data=train_pool, type="LossFunctionChange")
+
+    print(f"feature_importance: {feature_importance}")
 
     r2_score = r2_score(y_test, predicted)
 
@@ -72,14 +79,20 @@ try:
     roc_auc = roc_auc_score(y_test, pred_cb, multi_class='ovr')
 
     print(f"roc_auc cat_boost : {roc_auc}")
-
+    feature_names = dataframe_train.columns
+    feature_importance = pd.DataFrame({'feature': feature_names, 'importance': feature_importance})
+    loss_function_change = pd.DataFrame({'feature': feature_names, 'importance': loss_function_change})
+    prediction_values_change = pd.DataFrame({'feature': feature_names, 'importance': prediction_values_change})
     report = f'''
+       
         cat_boost report:
         roc_auc_score : {roc_auc}
         Accuracy : {accuracy}
         r2_score : {r2_score}
-        best_params : {gs_cb.best_params_}
-        best_score : {gs_cb.best_score_}
+        feature_importance : {feature_importance}
+        loss_function_change: {loss_function_change}
+        prediction_values_change: {prediction_values_change}
+        best_params: {best_params}
         '''
     notify_bot(report)
 

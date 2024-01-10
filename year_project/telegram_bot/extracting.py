@@ -84,3 +84,40 @@ def get_hog_std(img):
     """
     fd = get_hog_features(img)
     return np.std(fd) if len(fd) else 0
+
+
+def find_hough_circles(image, retry=False):
+    """
+    Finding the Hough Circles in a given image
+    """
+    try:
+        img = image.copy()
+
+        if retry:
+            img = img.astype('uint8')
+
+        img = cv2.medianBlur(img, 9)
+        gray_img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+
+        # Finding circles using Hough Transform
+        circles = cv2.HoughCircles(gray_img,
+                                   cv2.HOUGH_GRADIENT,
+                                   dp=1,
+                                   minDist=40,
+                                   param1=30,
+                                   param2=50,
+                                   minRadius=0,
+                                   maxRadius=130)
+
+    except:
+        # Retry when it has to be changed to type uint8, which is only for augmented images
+        circles = find_hough_circles(image, retry=True)
+
+    return circles if circles is not None else np.array([[[]]])
+
+
+def count_hough_circles(image):
+    """
+    Returning the number of Hough Circles in the input image
+    """
+    return find_hough_circles(image).shape[1]
