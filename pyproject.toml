@@ -1,0 +1,47 @@
+[tool.poetry]
+name = "hse-medical-pictures-analyze"
+version = "0.1.0"
+description = "HSE anual ML project"
+authors = ["Your Name <you@example.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[tool.poetry.dev-dependencies]
+DAWG-Python = "0.7.2"
+docopt = "0.6.2"
+intervaltree = "3.1.0"
+ipymarkup = "0.9.0"
+navec = "0.10.0"
+pymorphy2 = "0.9.1"
+pymorphy2-dicts-ru = "2.4.417127.4579844"
+razdel = "0.5.0"
+slovnet = "0.6.0"
+sortedcontainers = "2.4.0"
+yargy = "0.16.0"
+aiogram = "3.0"
+scikit-learn = "1.3.1"
+requests = "2.31.0"
+asyncio = "3.4.3"
+python-dotenv = "1.0.0"
+aiohttp-socks = "0.8.3"
+psycopg2-binary = "2.9.7"
+flake8 = "6.1.0"
+numpy = "~=1.26.3"
+pandas = "~=2.1.4"
+seaborn = "~=0.13.0"
+matplotlib = "~=3.8.2"
+scikit-image = "~=0.22.0"
+boto3 = "~=1.28.80"
+opencv-python = "~=4.8.1.78"
+pillow = "~=9.0.1"
+SciPy = "~=1.11.3"
+xgboost = "~=2.0.3"
+catboost = "~=1.2.2"
+SQLAlchemy = "~=2.0.22"
+optuna = "~=3.5.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

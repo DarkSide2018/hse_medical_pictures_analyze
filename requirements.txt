@@ -17,8 +17,8 @@ python-dotenv==1.0.0
 aiohttp-socks==0.8.3
 psycopg2-binary==2.9.7
 flake8==6.1.0
-numpy~=1.22.4
-pandas~=2.1.1
+numpy~=1.26.3
+pandas~=2.1.4
 seaborn~=0.13.0
 matplotlib~=3.8.2
 scikit-image~=0.22.0
