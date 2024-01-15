@@ -10,7 +10,7 @@ from aiogram.types import Message
 from dotenv import load_dotenv
 
 from year_project.telegram_bot.tgb_service import create_predictable_dataframe, get_label, \
-    create_predictable_dataframe_cat_boost
+    create_predictable_dataframe_cat_boost#, create_predictable_dataframe_rf_logreg
 from year_project.telegram_bot.upload_model_to_s3 import model_from_s3
 
 logging.basicConfig(
@@ -81,6 +81,30 @@ async def handle_image_xg_boost(message: types.Message):
     dataframe = create_predictable_dataframe(downloaded_file)
     predicted = pickled_model.predict(dataframe)
     await message.answer(f"{message.from_user.full_name} : предсказанное значение : {get_label(predicted[0])}")
+
+
+# @router.message(Command("send_photo_logreg"))
+# async def handle_image_logreg(message: types.Message):
+#     await bot.download(
+#         message.photo[-1],
+#         destination=f'year_project/telegram_bot/photos_for_rf_logreg/{message.photo[-1].file_id}.jpg'
+#     )
+#     dataframe = create_predictable_dataframe_rf_logreg(f'year_project/telegram_bot/photos_for_rf_logreg/{message.photo[-1].file_id}.jpg')
+#     pickled_model = pickle.load(open('year_project/telegram_bot/logreg_clf.pkl', 'rb'))
+#     predicted = pickled_model.predict(dataframe)
+#     await message.answer(f"{message.from_user.full_name} : предсказанное значение : {get_label(predicted[-1])}")
+#
+#
+# @router.message(Command("send_photo_random_forest"))
+# async def handle_image_random_forest(message: types.Message):
+#     await bot.download(
+#         message.photo[-1],
+#         destination=f'year_project/telegram_bot/photos_for_rf_logreg/{message.photo[-1].file_id}.jpg'
+#     )
+#     dataframe = create_predictable_dataframe_rf_logreg(f'year_project/telegram_bot/photos_for_rf_logreg/{message.photo[-1].file_id}.jpg')
+#     pickled_model = pickle.load(open('year_project/telegram_bot/rf_clf.pkl', 'rb'))
+#     predicted = pickled_model.predict(dataframe)
+#     await message.answer(f"{message.from_user.full_name} : предсказанное значение : {get_label(predicted[-1])}")
 
 
 async def main() -> None:
