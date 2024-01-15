@@ -4,13 +4,13 @@ from sklearn import svm
 from sklearn.metrics import roc_auc_score, accuracy_score, r2_score
 from sklearn.model_selection import GridSearchCV
 
-from year_project.telegram_bot.functions import data_dictionary
+from year_project.telegram_bot.functions import data_dictionary, get_skin_problems_dataset
 from year_project.telegram_bot.notify_bot_service import notify_bot
 
 notify_bot("SVC model started")
 
-dataframe_train = data_dictionary(part="train")
-dataframe_test = data_dictionary(part="test")
+dataframe_train = get_skin_problems_dataset(part="train")
+dataframe_test = get_skin_problems_dataset(part="test")
 
 print(f"dataframe_train : {dataframe_train}")
 print(f"dataframe_test: {dataframe_test}")
@@ -35,7 +35,7 @@ params = {
     'C': [1]
 }
 
-gs_svm_svc = GridSearchCV(clf, params, cv=1, scoring='r2', verbose=2)
+gs_svm_svc = GridSearchCV(clf, params, cv=2, scoring='r2', verbose=2)
 
 notify_bot(f"svm.SVC started grid search")
 
@@ -43,10 +43,10 @@ gs_svm_svc.fit(X_train, y_train)
 
 gs_svm_svc_best_estimator = gs_svm_svc.best_estimator_
 
-with open('svm_svc_best_estimator.pickle', 'wb') as f:
+with open('models/svm_svc_best_estimator.pickle', 'wb') as f:
     pickle.dump(gs_svm_svc_best_estimator, f)
 
-pickled_model = pickle.load(open('svm_svc_best_estimator.pickle', 'rb'))
+pickled_model = pickle.load(open('models/svm_svc_best_estimator.pickle', 'rb'))
 
 pred_cb = pickled_model.predict_proba(X_test)
 predicted = pickled_model.predict(X_test)

@@ -8,15 +8,15 @@ from sklearn.metrics import r2_score
 from sklearn.metrics import roc_auc_score
 from sklearn.preprocessing import StandardScaler
 
-from year_project.telegram_bot.functions import get_skin_problems_dataset
+from year_project.telegram_bot.functions import get_db_skin_problems
 from year_project.telegram_bot.notify_bot_service import notify_bot
 from year_project.telegram_bot.optuna_optimizer import create_best_params
 
 try:
 
-    dataframe_train = get_skin_problems_dataset("train")
-    print(dataframe_train.columns)
-    dataframe_test = get_skin_problems_dataset("test")
+    dataframe_train = get_db_skin_problems("train")
+    print(dataframe_train)
+    dataframe_test = get_db_skin_problems("test")
     print(dataframe_test)
     y_train = dataframe_train['target']
     dataframe_train.drop('target', axis=1, inplace=True)
@@ -28,7 +28,7 @@ try:
     dataframe_train_scaled = scaler.fit_transform(dataframe_train)
     dataframe_test_scaled = scaler.fit_transform(dataframe_test)
 
-    pca = PCA(n_components=4)
+    pca = PCA(n_components=50)
     data_train_pca_transformed = pca.fit_transform(dataframe_train_scaled)
     data_test_pca_transformed = pca.fit_transform(dataframe_test_scaled)
 
@@ -37,29 +37,29 @@ try:
 
     notify_bot(f"CatBoostClassifier started optuna")
 
-    best_params = create_best_params(X_train, y_train)
+    #best_params = create_best_params(X_train, y_train)
 
-    model = CatBoostClassifier(max_depth=best_params['max_depth'],
+    model = CatBoostClassifier(max_depth=14,
                                eval_metric='HammingLoss',
-                               learning_rate=best_params['learning_rate'],
-                               n_estimators=best_params['n_estimators'],
+                               learning_rate=0.1,
+                               n_estimators=600,
                                early_stopping_rounds=10,
                                random_seed=42,
                                loss_function='MultiClass',
-                               bagging_temperature=best_params['bagging_temperature'],
+                               bagging_temperature=0.1,
                                classes_count=23,
                                thread_count=-1,
-                               l2_leaf_reg=best_params['l2_leaf_reg'],
+                               l2_leaf_reg=0.1,
                                class_names=list(range(23)),
                                verbose=200
                                )
 
     model.fit(X_train, y_train)
 
-    with open('cat_boost_model.pickle', 'wb') as f:
+    with open('models/cat_boost_model.pickle', 'wb') as f:
         pickle.dump(model, f)
 
-    pickled_model = pickle.load(open('cat_boost_model.pickle', 'rb'))
+    pickled_model = pickle.load(open('models/cat_boost_model.pickle', 'rb'))
 
     pred_cb = pickled_model.predict_proba(X_test)
     predicted = pickled_model.predict(X_test)
@@ -97,7 +97,6 @@ try:
         feature_importance : {feature_importance}
         loss_function_change: {loss_function_change}
         prediction_values_change: {prediction_values_change}
-        best_params: {best_params}
         '''
     notify_bot(report)
 

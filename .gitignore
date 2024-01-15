@@ -1,4 +1,4 @@
 .idea
 .env
 /year_project/telegram_bot/catboost_info/
-/year_project/telegram_bot/catboost_info/
+/year_project/telegram_bot/models/gs_cb_best_estimator_.pickle

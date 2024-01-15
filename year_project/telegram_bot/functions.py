@@ -1,12 +1,15 @@
 import concurrent.futures
 import os
-
+from io import BytesIO
+import numpy as np
+from PIL import Image
 import pandas as pd
 import psycopg2
 from pandas import DataFrame
 from skimage import io
+from skimage.feature import hog
 from sqlalchemy import create_engine
-
+from multiprocessing import Pool
 from year_project.telegram_bot.extracting import round_half_up, calculate_channel_average, get_hog_mean, get_hog_std, \
     get_harris_corners_count, get_harris_corner_mean
 import requests
@@ -42,6 +45,55 @@ conn_select.autocommit = True
 
 def get_connection():
     return conn_select
+
+
+def get_db_skin_problems(table):
+    cursor = conn_select.cursor()
+    sql1 = f'''select
+    target,
+    red_channel_intensity,
+    blue_channel_intensity,
+    green_channel_intensity,
+    hog_mean,
+    harris_count,
+    harris_count_mean,
+    hog_std, 
+    image from medical_pictures_{table}'''
+    cursor.execute(sql1)
+    try:
+        data_postgres = cursor.fetchall()
+        cursor.close()
+        if len(data_postgres) != 0:
+            frame = DataFrame(data_postgres)
+            frame.columns = ['target',
+                             'red_channel_intensity',
+                             'blue_channel_intensity',
+                             'green_channel_intensity',
+                             'HOG_mean',
+                             'harris_count',
+                             'harris_count_mean',
+                             'HOG_std',
+                             'image']
+
+            hog_features = []
+            for item in data_postgres:
+                image = Image.open(BytesIO(item[8]))
+                image_data = np.array(image)
+                fd, hog_image = hog(image_data, channel_axis=2, orientations=9, pixels_per_cell=(20, 20),
+                                    cells_per_block=(5, 5),
+                                    visualize=True)
+                hog_features.append(fd)
+
+            hog_df = pd.DataFrame(hog_features)
+            frame.drop('image', axis=1, inplace=True)
+
+            concat = pd.concat([frame, hog_df], axis=1)
+            concat.columns = concat.columns.astype(str)
+            return concat
+    except Exception as error:
+        print("An exception occurred during get_db_skin_problems:", error)
+    finally:
+        cursor.close()
 
 
 def process_class(j, path_train_item, k, i):

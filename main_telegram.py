@@ -46,7 +46,7 @@ async def handle_image_svm(message: types.Message):
     file_id = message.photo[-1].file_id
     file_info = await bot.get_file(file_id)
     downloaded_file = await bot.download_file(file_info.file_path)
-    pickled_model = pickle.load(open('year_project/telegram_bot/svm_svc_best_estimator.pickle', 'rb'))
+    pickled_model = pickle.load(open('year_project/telegram_bot/models/svm_svc_best_estimator.pickle', 'rb'))
     dataframe = create_predictable_dataframe(downloaded_file)
     predicted = pickled_model.predict(dataframe)
     await message.answer(f"{message.from_user.full_name} : предсказанное значение : {get_label(predicted[0])}")
@@ -77,7 +77,7 @@ async def handle_image_xg_boost(message: types.Message):
     file_id = message.photo[-1].file_id
     file_info = await bot.get_file(file_id)
     downloaded_file = await bot.download_file(file_info.file_path)
-    pickled_model = pickle.load(open('year_project/telegram_bot/xgb_classifier.pickle', 'rb'))
+    pickled_model = pickle.load(open('year_project/telegram_bot/models/xgb_classifier.pickle', 'rb'))
     dataframe = create_predictable_dataframe(downloaded_file)
     predicted = pickled_model.predict(dataframe)
     await message.answer(f"{message.from_user.full_name} : предсказанное значение : {get_label(predicted[0])}")

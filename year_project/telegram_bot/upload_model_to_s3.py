@@ -14,7 +14,7 @@ s3 = boto3.client('s3', aws_access_key_id=access_key, aws_secret_access_key=secr
 
 # Загрузка файла в бакет
 bucket_name = 'cat-boost-model'
-file_path = 'gs_cb_best_estimator_.pickle'
+file_path = 'models/gs_cb_best_estimator_.pickle'
 object_name = 'gs_cb_best_estimator'
 
 

@@ -4,11 +4,11 @@ from sklearn.metrics import roc_auc_score, accuracy_score, r2_score
 from sklearn.model_selection import GridSearchCV
 from xgboost import XGBClassifier
 
-from year_project.telegram_bot.functions import data_dictionary
+from year_project.telegram_bot.functions import data_dictionary, get_skin_problems_dataset
 from year_project.telegram_bot.notify_bot_service import notify_bot
 
-dataframe_train = data_dictionary(part="train").astype(float)
-dataframe_test = data_dictionary(part="test").astype(float)
+dataframe_train = get_skin_problems_dataset(part="train").astype(float)
+dataframe_test = get_skin_problems_dataset(part="test").astype(float)
 
 y_train = dataframe_train['target']
 
@@ -38,16 +38,16 @@ param_grid = {
     'n_estimators': [600]
 }
 
-grid_search = GridSearchCV(estimator=model, scoring='r2', param_grid=param_grid, cv=1)
+grid_search = GridSearchCV(estimator=model, scoring='r2', param_grid=param_grid, cv=2)
 
 grid_search.fit(X_train, y_train)
 
 model = grid_search.best_estimator_
 
-with open('xgb_classifier.pickle', 'wb') as f:
+with open('models/xgb_classifier.pickle', 'wb') as f:
     pickle.dump(model, f)
 
-pickled_model = pickle.load(open('xgb_classifier.pickle', 'rb'))
+pickled_model = pickle.load(open('models/xgb_classifier.pickle', 'rb'))
 
 predicted_probabilities = pickled_model.predict_proba(X_test)
 
