@@ -12,8 +12,9 @@ docker run --name medical-postgres   \
              -e POSTGRES_USER=hse_medical     \
              -e POSTGRES_PASSWORD=123456    \
              -e POSTGRES_DB=hse_medical -p 5450:5432 \
-             -v "./sql":/docker-entrypoint-initdb.d \
              postgres
+#             -v "./sql":/docker-entrypoint-initdb.d \
+
 
 
 echo "=========================="
