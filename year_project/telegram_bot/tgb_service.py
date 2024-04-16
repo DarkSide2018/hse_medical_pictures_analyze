@@ -3,9 +3,8 @@ import os
 
 import numpy as np
 import pandas as pd
-from PIL import Image#, ImageOps
+from PIL import Image
 from dotenv import load_dotenv
-# from torchvision.transforms import v2
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
@@ -70,17 +69,6 @@ def create_predictable_dataframe(image):
         'HOG_std': hog_std
     }
     return pd.DataFrame.from_dict(data=new_row, orient='index').T
-
-
-# def create_predictable_dataframe_rf_logreg(path):
-#     X = []
-#     with Image.open(path) as img:
-#         img = np.array(v2.Resize(size=(256, 256))(ImageOps.grayscale(img)))
-#         pca = PCA(75)
-#         img_pca = pca.fit_transform(img)
-#         X.append(img_pca.flatten())
-#         X = np.array(X)
-#     return X
 
 
 def get_label(number):
