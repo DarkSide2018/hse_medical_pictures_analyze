@@ -1,3 +1,5 @@
 .idea
 .env
 /year_project/telegram_bot/catboost_info/
+/year_project/notebooks/neural-networks-filatov/.keepdir
+
