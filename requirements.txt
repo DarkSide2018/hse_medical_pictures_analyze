@@ -1,6 +1,7 @@
 DAWG-Python==0.7.2
 docopt==0.6.2
 intervaltree==3.1.0
+torch==2.3.1+cu121
 ipymarkup==0.9.0
 navec==0.10.0
 pymorphy2==0.9.1
