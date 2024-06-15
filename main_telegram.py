@@ -4,13 +4,15 @@ import logging
 import os
 import pickle
 
+import torch
 from aiogram import Bot, Dispatcher, Router, types
 from aiogram.filters import Command
 from aiogram.types import Message
 from dotenv import load_dotenv
 
 from year_project.telegram_bot.tgb_service import create_predictable_dataframe, get_label, \
-    create_predictable_dataframe_cat_boost#, create_predictable_dataframe_rf_logreg
+    create_predictable_dataframe_cat_boost, \
+    create_predictable_object_for_google_net  # , create_predictable_dataframe_rf_logreg
 from year_project.telegram_bot.upload_model_to_s3 import model_from_s3
 
 logging.basicConfig(
@@ -80,6 +82,18 @@ async def handle_image_xg_boost(message: types.Message):
     pickled_model = pickle.load(open('year_project/telegram_bot/xgb_classifier.pickle', 'rb'))
     dataframe = create_predictable_dataframe(downloaded_file)
     predicted = pickled_model.predict(dataframe)
+    await message.answer(f"{message.from_user.full_name} : предсказанное значение : {get_label(predicted[0])}")
+
+
+@router.message(Command("send_photo_google_net"))
+async def handle_image_google_net(message: types.Message):
+    file_id = message.photo[-1].file_id
+    file_info = await bot.get_file(file_id)
+    downloaded_file = await bot.download_file(file_info.file_path)
+    pickled_model = pickle.load(open('year_project/telegram_bot/models/googleNet.pickle', 'rb'))
+    dataframe = create_predictable_object_for_google_net(downloaded_file)
+    outputs = pickled_model(dataframe)
+    _, predicted = torch.max(outputs, 1)
     await message.answer(f"{message.from_user.full_name} : предсказанное значение : {get_label(predicted[0])}")
 
 
