@@ -3,15 +3,14 @@ import os
 
 import numpy as np
 import pandas as pd
+import torch
 import torchvision
 from PIL import Image
 from dotenv import load_dotenv
-from mlflow.recipes.steps.ingest import CustomDataset
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from torchvision.transforms import transforms
 
-from year_project.telegram_bot.GoogleNetDataset import Google_Net_Dataset
 from year_project.telegram_bot.extracting import round_half_up, get_hog_mean, get_hog_std, get_harris_corners_count, \
     get_harris_corner_mean, calculate_channel_average_v2, count_hough_circles
 from year_project.telegram_bot.functions import get_connection
@@ -73,6 +72,10 @@ def create_predictable_dataframe(image):
         'HOG_std': hog_std
     }
     return pd.DataFrame.from_dict(data=new_row, orient='index').T
+
+def create_predicted_value(tensor):
+    _, predicted = torch.max(tensor, 1)
+    return predicted
 
 def create_predictable_object_for_google_net(image):
     read = image.read()
